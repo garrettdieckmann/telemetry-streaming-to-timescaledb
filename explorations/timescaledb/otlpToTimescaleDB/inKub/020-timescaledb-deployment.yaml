@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: timescaledb
+  name: timescaledb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timescaledb
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: timescaledb
+    spec:
+      containers:
+      - image: timescaledev/promscale-extension:latest-ts2-pg13
+        name: promscale-extension
+        ports:
+          - containerPort: 5432
+        env:
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: timescaledb-password
+                key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: timescaledb
+  name: timescaledb-svc
+spec:
+  ports:
+  - port: 5432
+    protocol: TCP
+  selector:
+    app: timescaledb
+  type: ClusterIP

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: promscale
+  name: promscale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: promscale
+  template:
+    metadata:
+      labels:
+        app: promscale
+    spec:
+      containers:
+      - image: timescale/promscale:latest
+        name: promscale
+        ports:
+          - containerPort: 9201
+        env:
+          - name: PROMSCALE_DB_URI
+            valueFrom:
+              secretKeyRef:
+                name: promscale
+                key: db-uri
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: promscale
+  name: promscale-svc
+spec:
+  ports:
+  - port: 9201
+    protocol: TCP
+  selector:
+    app: promscale
+  type: ClusterIP
