@@ -1,11 +1,9 @@
 import os
 import psycopg2
-import psycopg2.extras as extras
+import psycopg2.extras
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import datetime
-import pickle
 from pmdarima.arima import auto_arima
 
 timescale_host = os.environ.get('TS_HOST')
@@ -36,18 +34,15 @@ all_time_series_df = pd.DataFrame(np.array(cursor.fetchall()), columns = ['bucke
 
 
 def make_model_by_hostname(df):
-    # set the index of dataframes to the timestamp
+    # set the index of dataframes to the 'bucketed_time'
     df.set_index('bucketed_time', inplace = True)
-    df = df.drop(['hostname'], axis = 1)
+    host_df = df.drop(['hostname'], axis = 1)
+    host_df.dropna(inplace = True)
     # convert trip_length into a numeric value in seconds
-    arima_model = auto_arima(df)
+    arima_model = auto_arima(host_df)
 
-    predicted_data_start_time = df.index.max() + datetime.timedelta(minutes = 1)
-    print(df)
-    print(df.index.max())
-    print(predicted_data_start_time)
+    predicted_data_start_time = host_df.index.max() + datetime.timedelta(minutes = 1)
     forecast_datetime_index = pd.date_range(start=predicted_data_start_time, periods=20, freq='1min')
-    print(forecast_datetime_index)
     # get conf_int, which is our lower and upper bounds of the prediction
     _, conf_int = arima_model.predict(n_periods = 20, return_conf_int=True)
 
