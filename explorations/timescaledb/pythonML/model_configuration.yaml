@@ -1,0 +1,10 @@
+models:
+  - model_name: "predictions_system_cpu"
+    dimension: hostname
+    sql_query: >- 
+      SELECT time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "system_cpu",
+        jsonb(labels) ->> 'hostname' as "hostname"
+      FROM system_cpu
+      GROUP BY bucketed_time, hostname
+      ORDER BY bucketed_time
