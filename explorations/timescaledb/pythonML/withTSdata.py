@@ -1,11 +1,15 @@
 import os
 import psycopg2
 import psycopg2.extras
+from psycopg2 import sql
 import pandas as pd
 import numpy as np
 import datetime
 import yaml
+import logging
 from pmdarima.arima import auto_arima
+
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 timescale_host = os.environ.get('TS_HOST')
 timescale_user = os.environ.get('TS_USER')
@@ -35,37 +39,65 @@ def make_model_by_dimension(df, dimension_name):
     with_conf_interval.columns = ['lower_bounds', 'upper_bounds']
     return with_conf_interval
 
-def replace_model_predictions(model, dimension_name, dimension):
-    model[dimension_name] = dimension
+def replace_model_predictions(model, model_config, dimension):
+    model[model_config['dimension']] = dimension
     model.reset_index(inplace=True)
     df_columns = list(model)
-    # create (col1,col2,...)
-    columns = ",".join(df_columns)
-
-    # create VALUES('%s', '%s",...) one '%s' per column
-    values = "VALUES({})".format(",".join(["%s" for _ in df_columns])) 
 
     cur = conn.cursor()
-    cur.execute("DELETE FROM %s WHERE %s = %s", ('TABLE_NAME', 'DIMENSION', dimension))
-    conn.commit()
+    # Create the table if it does not exist
+    cur.execute(
+        sql.SQL("create table if not exists {} ({})")
+            .format(
+                sql.Identifier(model_config['model_name']),
+                sql.SQL("time_bucket timestamp with time zone, "
+                        "lower_bounds double precision, "
+                        "upper_bounds double precision, "
+                        "{} varchar".format(model_config['dimension']))
+            )
+    )
+    # Create index
+    cur.execute(
+        sql.SQL("create unique index if not exists {} on {} using btree (\"time_bucket\", {})")
+            .format(
+                sql.Identifier("{}_idx".format(model_config['model_name'])),
+                sql.Identifier(model_config['model_name']),
+                sql.Identifier(model_config['dimension'])
+            )
+    )
 
-    # create INSERT INTO table (columns) VALUES('%s',...)
-    insert_stmt = "INSERT INTO %s ({}) {}".format('TABLE_NAME', columns, values)
+    # Delete stored model values
+    cur.execute(
+        sql.SQL("delete from {} where {} = %s").format(
+            sql.Identifier(model_config['model_name']),
+            sql.Identifier(model_config['dimension'])
+        ), [dimension]
+    )
 
-    psycopg2.extras.execute_batch(cur, insert_stmt, model.values)
+    # Insert new model values
+    insert_str = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
+        sql.Identifier(model_config['model_name']),
+        sql.SQL(",").join(map(sql.Identifier, df_columns)),
+        sql.SQL(",").join(map(sql.Placeholder, df_columns))
+    )
+    psycopg2.extras.execute_batch(cur, insert_str, model.to_dict('records'))
     conn.commit()
     cur.close()
 
-def process_by_the_dimension(dimension_name, all_time_series_df):
+def process_by_the_dimension(model_config, all_time_series_df):
+    dimension_name = model_config['dimension']
     for dimension in all_time_series_df[dimension_name].unique():
         df = all_time_series_df.loc[all_time_series_df[dimension_name] == dimension]
+        logging.info("[model = {}] - building model for dimension: {}".format(model_config['model_name'], dimension))
         model = make_model_by_dimension(df, dimension_name)
-        replace_model_predictions(model, dimension_name, dimension)
+        logging.info("[model = {}] - saving model values for dimension: {}".format(model_config['model_name'], dimension))
+        replace_model_predictions(model, model_config, dimension)
 
 with open("model_configuration.yaml", 'r') as stream:
     loaded_configuration = yaml.safe_load(stream)
 
 for model_config in loaded_configuration['models']:
+    logging.info("Running query for model: {}".format(model_config['model_name']))
     cursor = conn.cursor()
     # execute SQL query
     cursor.execute(model_config['sql_query'])
@@ -73,5 +105,7 @@ for model_config in loaded_configuration['models']:
     columns = ['bucketed_time', 'value']
     columns.extend([model_config['dimension']])
     all_time_series_df = pd.DataFrame(np.array(cursor.fetchall()), columns = columns)
-    process_by_the_dimension(model_config['dimension'], all_time_series_df)
+    process_by_the_dimension(model_config, all_time_series_df)
     cursor.close()
+
+logging.info("All models built and saved")

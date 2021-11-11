@@ -7,4 +7,35 @@ models:
         jsonb(labels) ->> 'hostname' as "hostname"
       FROM system_cpu
       GROUP BY bucketed_time, hostname
-      ORDER BY bucketed_time
+      ORDER BY bucketed_time desc
+      limit 1440 -- limit to last day
+  - model_name: "predictions_system_tmmCpu"
+    dimension: hostname
+    sql_query: >- 
+      SELECT time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "system_tmmCpu",
+        jsonb(labels) ->> 'hostname' as "hostname"
+      FROM "system_tmmCpu"
+      GROUP BY bucketed_time, hostname
+      ORDER BY bucketed_time desc
+      limit 1440 -- limit to last day
+  - model_name: "predictions_system_memory"
+    dimension: hostname
+    sql_query: >- 
+      SELECT time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "system_memory",
+        jsonb(labels) ->> 'hostname' as "hostname"
+      FROM "system_memory"
+      GROUP BY bucketed_time, hostname
+      ORDER BY bucketed_time desc
+      limit 1440 -- limit to last day
+  - model_name: "predictions_system_tmmMemory"
+    dimension: hostname
+    sql_query: >- 
+      SELECT time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "system_tmmMemory",
+        jsonb(labels) ->> 'hostname' as "hostname"
+      FROM "system_tmmMemory"
+      GROUP BY bucketed_time, hostname
+      ORDER BY bucketed_time desc
+      limit 1440 -- limit to last day

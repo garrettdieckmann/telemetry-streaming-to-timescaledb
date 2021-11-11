@@ -9,12 +9,25 @@ Also demonstrates how a model can be generated, and saved (by pickling the model
 (covered below, in [Sources used](#sources-used) section)
 * a running TimescaleDB (or Postgresql) instance
 * simulated IOT sensor generated
-
 ```
 export TS_HOST=yourhost.domain.com
 export TS_USER=yourUser
 export TS_PASSWORD=yourPassword
 python main.py
+```
+
+## Run the Telemetry Streaming example
+#### Pre-reqs:
+(covered below, in [Sources used](#sources-used) section)
+* a running TimescaleDB (or Postgresql) instance
+* initial metrics data loaded into TimescaleDB (loaded via PromScale, scraping Prometheus)
+* configuration file (ex: `model_configuration.yaml`) defining the models to create, and where to locate the source data
+```
+export TS_HOST=yourhost.domain.com
+export TS_USER=yourUser
+export TS_PASSWORD=yourPassword
+export TS_PORT=yourPort
+python withTSdata.py
 ```
 
 ## Sources used
