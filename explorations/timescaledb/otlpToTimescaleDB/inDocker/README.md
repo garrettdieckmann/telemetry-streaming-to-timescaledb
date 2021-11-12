@@ -81,3 +81,10 @@ Run a Grafana container:
 ```
 docker run --rm -d --name grafana -p 3000:3000 grafana/grafana
 ```
+
+# Run the Promscale maintenance task
+Promscale has a maintenance task to run (recommendation is every 30 minutes) - https://github.com/timescale/promscale/blob/master/docs/docker.md#-setting-up-cron-jobs
+Can be run in Docker:
+```
+docker run -d --name promscale-maintenance --rm jbergknoff/postgresql-client $PROMSCALE_DB_URI psql -c "CALL execute_maintenance();"
+```
