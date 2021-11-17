@@ -1,0 +1,91 @@
+models:
+  - model_name: "predictions_system_cpu"
+    dimension: hostname
+    sql_query: >- 
+      with last_7_days as (
+        select time as "time",
+          value as "value",
+          jsonb(labels) ->> 'hostname' as "hostname"
+        from system_cpu
+        where time > current_timestamp - interval '7 day'
+      )
+      select time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "value",
+        hostname
+      from last_7_days
+      group by bucketed_time, hostname
+  - model_name: "predictions_system_tmmCpu"
+    dimension: hostname
+    sql_query: >- 
+      with last_7_days as (
+        select time as "time",
+          value as "value",
+          jsonb(labels) ->> 'hostname' as "hostname"
+        from "system_tmmCpu"
+        where time > current_timestamp - interval '7 day'
+      )
+      select time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "value",
+        hostname
+      from last_7_days
+      group by bucketed_time, hostname
+  - model_name: "predictions_system_memory"
+    dimension: hostname
+    sql_query: >- 
+      with last_7_days as (
+        select time as "time",
+          value as "value",
+          jsonb(labels) ->> 'hostname' as "hostname"
+        from system_memory
+        where time > current_timestamp - interval '7 day'
+      )
+      select time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "value",
+        hostname
+      from last_7_days
+      group by bucketed_time, hostname
+  - model_name: "predictions_system_tmmMemory"
+    dimension: hostname
+    sql_query: >- 
+      with last_7_days as (
+        select time as "time",
+          value as "value",
+          jsonb(labels) ->> 'hostname' as "hostname"
+        from "system_tmmMemory"
+        where time > current_timestamp - interval '7 day'
+      )
+      select time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "value",
+        hostname
+      from last_7_days
+      group by bucketed_time, hostname
+  - model_name: "predictions_virtualServers_clientside_bitsIn"
+    dimension: name
+    sql_query: >-
+      with last_7_days as (
+        select time as "time",
+          value as "value",
+          jsonb(labels) ->> 'name' as "name"
+        from "virtualServers_clientside_bitsIn"
+        where time > current_timestamp - interval '7 day'
+      )
+      select time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "value",
+        name
+      from last_7_days
+      group by bucketed_time, name
+  - model_name: "predictions_virtualServers_clientside_bitsOut"
+    dimension: name
+    sql_query: >- 
+      with last_7_days as (
+        select time as "time",
+          value as "value",
+          jsonb(labels) ->> 'name' as "name"
+        from "virtualServers_clientside_bitsOut"
+        where time > current_timestamp - interval '7 day'
+      )
+      select time_bucket('60.000s',"time") AS "bucketed_time",
+        avg(value) AS "value",
+        name
+      from last_7_days
+      group by bucketed_time, name
