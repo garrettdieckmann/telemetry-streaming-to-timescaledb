@@ -6,4 +6,4 @@ Metrics graphed in Grafana:
 | ----------- | ----------- | ----------- |
 | System      | CPU usage       | system_cpu, system_tmmCpu |
 | System      | Memory usage       | system_memory, system_tmmMemory |
-| System      | System Throughput       | system_throughputPerformance_current |
+| Virtuals      | Bits In/Out       | virtualServers_clientside_bitsIn, virtualServers_clientside_bitsOut |

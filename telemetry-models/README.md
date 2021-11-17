@@ -14,6 +14,6 @@ docker run -it -e TS_HOST=$TS_HOST \
     -e TS_USER=$TS_USER \
     -e TS_PASSWORD=$TS_PASSWORD \
     -e TS_PORT=$TS_PORT \
-    -v $(pwd)/examples/model_configuration.yaml:/app/model_configuration.yaml \
+    -v $(pwd)/examples/model_configuration.yaml:/etc/telemetry-models/model_configuration.yaml \
     gdieckmann/telemetry-models:1.0.0
 ```

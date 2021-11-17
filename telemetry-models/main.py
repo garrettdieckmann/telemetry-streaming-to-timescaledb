@@ -20,7 +20,7 @@ timescale_port = os.getenv('TS_PORT', 5432)
 if timescale_host is None or timescale_user is None or timescale_password is None:
     sys.exit("Environment variables are required to connect to TimescaleDB: TS_HOST, TS_USER, TS_PASSWORD")
 
-CONFIG_FILE = "/app/model_configuration.yaml"
+CONFIG_FILE = "/etc/telemetry-models/model_configuration.yaml"
 
 # establish connection
 conn = psycopg2.connect(host=timescale_host, user=timescale_user, password=timescale_password, port=timescale_port)

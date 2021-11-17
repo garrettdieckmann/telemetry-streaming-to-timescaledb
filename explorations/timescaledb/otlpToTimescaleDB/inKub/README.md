@@ -56,6 +56,18 @@ kubectl apply -f 060-otel-collector-deployment.yaml
 kubectl apply -f 070-grafana-deployment.yaml
 ```
 
+#### Deploy Telemetry Model as a CronJob
+- create the secrets needed to connect to TimescaleDB
+```
+export TIMESCALEDB_PASSWORD=<your-db-password>
+export TIMESCALEDB_USERNAME=<your-db-username>
+./080-create-telemetry-model-secrets.sh
+```
+- apply the telemetry-model kubernetes declaration (creates a configmap and a cronjob)
+```
+kubectl apply -f 090-create-telemetry-model-cron-job.yaml
+```
+
 ## Publishing metrics to the OpenTelemetry Collector
 #### Using Telemetry Streaming on a BIG-IP
 Given the successful configuration of the components above, metrics from a BIG-IP can now be published to the OpenTelemetry Collector, by using the [OpenTelemetry_Exporter Consumer](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/setting-up-consumer.html#opentelemetry-exporter-experimental) in F5 Telemetry Streaming.
