@@ -7,6 +7,7 @@ namespace: telemetry-streaming-quickstart
 # Grafana default values
 grafana:
   deploymentName: grafana
+  configMapName: grafana-conf
   serviceName: grafana-external-svc
   nodePort: 30030
 

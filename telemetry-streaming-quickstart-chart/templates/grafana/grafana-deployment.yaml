@@ -18,5 +18,39 @@ spec:
       containers:
       - image: grafana/grafana
         name: {{ .Values.grafana.deploymentName }}
+        volumeMounts:
+        - name: {{ .Values.grafana.configMapName }}-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: {{ .Values.grafana.configMapName }}-dashboard-provider
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: {{ .Values.grafana.configMapName }}-dashboards
+          mountPath: /var/lib/grafana/dashboards
         ports:
           - containerPort: 3000
+        env:
+          - name: TIMESCALEDB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.timescaledb.secretName }}
+                key: password
+          - name: TIMESCALEDB_HOST
+            value: {{ .Values.timescaledb.serviceName }}
+      volumes:
+      - name: {{ .Values.grafana.configMapName }}-datasources
+        configMap:
+          name: {{ .Values.grafana.configMapName }}
+          items:
+          - key: defaultDatasources.yaml
+            path: defaultDatasources.yaml
+      - name: {{ .Values.grafana.configMapName }}-dashboard-provider
+        configMap:
+          name: {{ .Values.grafana.configMapName }}
+          items:
+          - key: defaultDashboards.yaml
+            path: defaultDashboards.yaml
+      - name: {{ .Values.grafana.configMapName }}-dashboards
+        configMap:
+          name: {{ .Values.grafana.configMapName }}
+          items:
+          - key: basicDashboard.json
+            path: basicDashboard.json
