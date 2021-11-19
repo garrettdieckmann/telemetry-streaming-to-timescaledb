@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: telemetry-model-builder
+  namespace: {{ .Values.namespace }}
+spec:
+  jobTemplate:
+    metadata:
+      name: telemetry-model-builder
+    spec:
+      template:
+        metadata:
+        spec:
+          containers:
+          - image: gdieckmann/telemetry-models:1.0.1
+            name: telemetry-model-builder
+            env:
+            - name: TS_HOST
+              value: "timescaledb-svc"
+            - name: TS_USER
+              valueFrom:
+                secretKeyRef:
+                  name: telemetry-model-db
+                  key: username
+            - name: TS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: telemetry-model-db
+                  key: password
+            volumeMounts:
+            - name: telemetry-model-builder-conf
+              mountPath: /etc/telemetry-models
+          volumes:
+          - name: telemetry-model-builder-conf
+            configMap:
+              name: telemetry-model-builder-conf
+              items:
+              - key: model_configuration.yaml
+                path: model_configuration.yaml
+          restartPolicy: OnFailure
+  schedule: "*/20 * * * *"

@@ -6,3 +6,4 @@ namespace: telemetry-streaming-quickstart
 
 timescaledb:
   password: 
+  username: postgres
