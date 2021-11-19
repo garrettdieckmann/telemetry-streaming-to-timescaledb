@@ -3,17 +3,17 @@ kind: Deployment
 metadata:
   namespace: {{ .Values.namespace }}
   labels:
-    app: timescaledb
-  name: timescaledb
+    app: {{ .Values.timescaledb.deploymentName }}
+  name: {{ .Values.timescaledb.deploymentName }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: timescaledb
+      app: {{ .Values.timescaledb.deploymentName }}
   template:
     metadata:
       labels:
-        app: timescaledb
+        app: {{ .Values.timescaledb.deploymentName }}
     spec:
       containers:
       - image: timescaledev/promscale-extension:latest-ts2-pg13
@@ -24,5 +24,5 @@ spec:
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: timescaledb-password
+                name: {{ .Values.timescaledb.secretName }}
                 key: password

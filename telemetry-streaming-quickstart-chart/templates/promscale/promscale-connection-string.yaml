@@ -4,4 +4,4 @@ data:
 kind: Secret
 metadata:
   namespace: {{ .Values.namespace }}
-  name: promscale-connection-string
+  name: {{ .Values.promscale.secretName }}

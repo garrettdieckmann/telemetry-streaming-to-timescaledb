@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: telemetry-model-builder-conf
+  name: {{ .Values.telemetryModel.configMapName }}
   namespace: {{ .Values.namespace }}
   labels:
     name: telemetry-model-builder-conf

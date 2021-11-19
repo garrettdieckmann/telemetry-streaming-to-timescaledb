@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: otel-collector-conf
+  name: {{ .Values.openTelemetry.configMapName }}
   namespace: {{ .Values.namespace }}
   labels:
-    name: otel-collector-conf
+    name: {{ .Values.openTelemetry.configMapName }}
 data:
   otelconfig.yaml: |-
     receivers:

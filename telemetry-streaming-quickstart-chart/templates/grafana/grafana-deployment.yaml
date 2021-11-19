@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: grafana
-  name: grafana
+    app: {{ .Values.grafana.deploymentName }}
+  name: {{ .Values.grafana.deploymentName }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: grafana
+      app: {{ .Values.grafana.deploymentName }}
   template:
     metadata:
       labels:
-        app: grafana
+        app: {{ .Values.grafana.deploymentName }}
     spec:
       containers:
       - image: grafana/grafana
-        name: grafana
+        name: {{ .Values.grafana.deploymentName }}
         ports:
           - containerPort: 3000

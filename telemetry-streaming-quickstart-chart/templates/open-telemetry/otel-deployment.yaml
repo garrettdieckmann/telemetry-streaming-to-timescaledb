@@ -2,32 +2,32 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: otel-collector
+    app: {{ .Values.openTelemetry.deploymentName }}
   name: otel-collector
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: otel-collector
+      app: {{ .Values.openTelemetry.deploymentName }}
   template:
     metadata:
       labels:
-        app: otel-collector
+        app: {{ .Values.openTelemetry.deploymentName }}
     spec:
       containers:
       - image: otel/opentelemetry-collector-contrib
-        name: otel-collector
+        name: {{ .Values.openTelemetry.deploymentName }}
         volumeMounts:
-        - name: otel-collector-conf
+        - name: {{ .Values.openTelemetry.configMapName }}
           mountPath: /etc/otel
         ports:
           - containerPort: 55681
           - containerPort: 9088
       volumes:
-      - name: otel-collector-conf
+      - name: {{ .Values.openTelemetry.configMapName }}
         configMap:
-          name: otel-collector-conf
+          name: {{ .Values.openTelemetry.configMapName }}
           items:
           - key: otelconfig.yaml
             path: config.yaml

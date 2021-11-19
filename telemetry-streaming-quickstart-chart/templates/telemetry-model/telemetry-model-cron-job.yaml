@@ -1,19 +1,19 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: telemetry-model-builder
+  name: {{ .Values.telemetryModel.cronJobName }}
   namespace: {{ .Values.namespace }}
 spec:
   jobTemplate:
     metadata:
-      name: telemetry-model-builder
+      name: {{ .Values.telemetryModel.cronJobName }}
     spec:
       template:
         metadata:
         spec:
           containers:
-          - image: gdieckmann/telemetry-models:1.0.1
-            name: telemetry-model-builder
+          - image: gdieckmann/telemetryModels:1.0.1
+            name: {{ .Values.telemetryModel.cronJobName }}
             env:
             - name: TS_HOST
               value: "timescaledb-svc"
@@ -28,12 +28,12 @@ spec:
                   name: telemetry-model-db
                   key: password
             volumeMounts:
-            - name: telemetry-model-builder-conf
+            - name: {{ .Values.telemetryModel.configMapName }}
               mountPath: /etc/telemetry-models
           volumes:
-          - name: telemetry-model-builder-conf
+          - name: {{ .Values.telemetryModel.configMapName }}
             configMap:
-              name: telemetry-model-builder-conf
+              name: {{ .Values.telemetryModel.configMapName }}
               items:
               - key: model_configuration.yaml
                 path: model_configuration.yaml

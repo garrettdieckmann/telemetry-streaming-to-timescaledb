@@ -4,6 +4,42 @@
 
 namespace: telemetry-streaming-quickstart
 
+# Grafana default values
+grafana:
+  deploymentName: grafana
+  serviceName: grafana-external-svc
+  nodePort: 30030
+
+# OpenTelemetry default values
+openTelemetry:
+  deploymentName: otel-collector
+  configMapName: otel-collector-conf
+  serviceName: otel-collector-prom-svc
+  externalServiceName: otel-collector-ingest-svc
+  nodePort: 30681
+
+# Prometheus default values
+prometheus:
+  deploymentName: prometheus
+  configMapName: prometheus-conf
+  serviceName: prometheus-svc
+
+# Promscale default values
+promscale:
+  deploymentName: promscale
+  serviceName: promscale-svc
+  secretName: promscale-connection-string
+
+# Telemetry-Model default values
+telemetryModel:
+  cronJobName: telemetry-model-builder
+  configMapName: telemetry-model-builder-conf
+  secretName: telemetry-model-db
+
+# TimescaleDB default values
 timescaledb:
-  password: 
+  deploymentName: timescaledb
+  serviceName:  timescaledb-svc
+  secretName: timescaledb-password
   username: postgres
+  password:

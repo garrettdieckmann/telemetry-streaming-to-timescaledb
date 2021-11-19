@@ -2,27 +2,27 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: promscale
-  name: promscale
+    app: {{ .Values.promscale.deploymentName }}
+  name: {{ .Values.promscale.deploymentName }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: promscale
+      app: {{ .Values.promscale.deploymentName }}
   template:
     metadata:
       labels:
-        app: promscale
+        app: {{ .Values.promscale.deploymentName }}
     spec:
       containers:
       - image: timescale/promscale:latest
-        name: promscale
+        name: {{ .Values.promscale.deploymentName }}
         ports:
           - containerPort: 9201
         env:
           - name: PROMSCALE_DB_URI
             valueFrom:
               secretKeyRef:
-                name: promscale-connection-string
+                name: {{ .Values.promscale.secretName }}
                 key: uri

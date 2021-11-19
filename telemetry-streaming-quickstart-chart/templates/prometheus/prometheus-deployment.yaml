@@ -2,31 +2,31 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: prometheus
-  name: prometheus
+    app: {{ .Values.prometheus.deploymentName }}
+  name: {{ .Values.prometheus.deploymentName }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: prometheus
+      app: {{ .Values.prometheus.deploymentName }}
   template:
     metadata:
       labels:
-        app: prometheus
+        app: {{ .Values.prometheus.deploymentName }}
     spec:
       containers:
       - image: prom/prometheus
-        name: prometheus
+        name: {{ .Values.prometheus.deploymentName }}
         volumeMounts:
-        - name: prometheus-conf
+        - name: {{ .Values.prometheus.configMapName }}
           mountPath: /etc/prometheus
         ports:
           - containerPort: 9090
       volumes:
-      - name: prometheus-conf
+      - name: {{ .Values.prometheus.configMapName }}
         configMap:
-          name: prometheus-conf
+          name: {{ .Values.prometheus.configMapName }}
           items:
           - key: prometheus.yml
             path: prometheus.yml

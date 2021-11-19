@@ -2,13 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: promscale
-  name: promscale-svc
+    app: {{ .Values.promscale.deploymentName }}
+  name: {{ .Values.promscale.serviceName }}
   namespace: {{ .Values.namespace }}
 spec:
   ports:
   - port: 9201
     protocol: TCP
   selector:
-    app: promscale
+    app: {{ .Values.promscale.deploymentName }}
   type: ClusterIP
