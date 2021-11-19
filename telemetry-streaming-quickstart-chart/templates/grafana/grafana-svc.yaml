@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     app: grafana
-  name: grafana-ingest-svc
+  name: grafana-external-svc
   namespace: {{ .Values.namespace }}
 spec:
   ports:
