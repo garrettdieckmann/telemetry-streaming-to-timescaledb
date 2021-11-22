@@ -1,11 +1,22 @@
 OpenTelemetry Metrics can now be sent to:
-export NODE_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-export OTEL_COLLECTOR_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services otel-collector-ingest-svc)
+{{- if .Values.openTelemetry.useLoadBalancer }}
+export OTEL_IP=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.status.loadBalancer.ingress[0].ip} services {{ .Values.grafana.externalServiceName }})
+export OTEL_COLLECTOR_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].port}" services {{ .Values.grafana.externalServiceName }})
+{{- else }}
+export OTEL_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+export OTEL_COLLECTOR_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Values.grafana.externalServiceName }})
+{{- end }}
 
-echo http://$NODE_IP:$OTEL_COLLECTOR_PORT
+
+echo http://$Values:$OTEL_COLLECTOR_PORT
 
 A fully configured Grafana dashboard should now be accessible at:
-export NODE_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-export GRAFANA_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services grafana-external-svc)
+{{- if .Values.openTelemetry.useLoadBalancer }}
+export GRAFANA_IP=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.status.loadBalancer.ingress[0].ip} services {{ .Values.grafana.serviceName }})
+export GRAFANA_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].port}" services {{ .Values.grafana.serviceName }})
+{{- else }}
+export GRAFANA_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+export GRAFANA_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Values.grafana.serviceName }})
+{{- end }}
 
-echo http://$NODE_IP:$GRAFANA_PORT
+echo http://$GRAFANA_IP:$GRAFANA_PORT

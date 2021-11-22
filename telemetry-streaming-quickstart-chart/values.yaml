@@ -9,7 +9,10 @@ grafana:
   deploymentName: grafana
   configMapName: grafana-conf
   serviceName: grafana-external-svc
+  adminPassword: secretAdmin
+  secretName: grafana-passwords
   nodePort: 30030
+  useLoadBalancer: false
 
 # OpenTelemetry default values
 openTelemetry:
@@ -18,6 +21,7 @@ openTelemetry:
   serviceName: otel-collector-prom-svc
   externalServiceName: otel-collector-ingest-svc
   nodePort: 30681
+  useLoadBalancer: false
 
 # Prometheus default values
 prometheus:

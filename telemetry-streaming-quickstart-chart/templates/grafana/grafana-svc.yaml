@@ -6,10 +6,18 @@ metadata:
   name: {{ .Values.grafana.serviceName }}
   namespace: {{ .Values.namespace }}
 spec:
+  {{- if .Values.grafana.useLoadBalancer }}
+  type: LoadBalancer
+  {{- else }}
+  type: NodePort
+  {{- end }}
+  selector:
+    app: {{ .Values.grafana.deploymentName }}
   ports:
   - port: 3000
     protocol: TCP
+    {{- if .Values.grafana.useLoadBalancer }}
+    targetPort: 3000
+    {{- else }}
     nodePort: {{ .Values.grafana.nodePort }}
-  selector:
-    app: {{ .Values.grafana.deploymentName }}
-  type: NodePort
+    {{- end }}

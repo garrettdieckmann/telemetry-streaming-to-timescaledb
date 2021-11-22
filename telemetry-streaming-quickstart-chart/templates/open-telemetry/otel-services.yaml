@@ -21,10 +21,18 @@ metadata:
   name: {{ .Values.openTelemetry.externalServiceName }}
   namespace: {{ .Values.namespace }}
 spec:
+  {{- if .Values.openTelemetry.useLoadBalancer }}
+  type: LoadBalancer
+  {{- else }}
+  type: NodePort
+  {{- end }}
+  selector:
+    app: {{ .Values.openTelemetry.deploymentName }}
   ports:
   - port: 55681
     protocol: TCP
+    {{- if .Values.openTelemetry.useLoadBalancer }}
+    targetPort: 55681
+    {{- else }}
     nodePort: {{ .Values.openTelemetry.nodePort }}
-  selector:
-    app: {{ .Values.openTelemetry.deploymentName }}
-  type: NodePort
+    {{- end }}

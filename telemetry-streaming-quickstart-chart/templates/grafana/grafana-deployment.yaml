@@ -35,6 +35,11 @@ spec:
                 key: password
           - name: TIMESCALEDB_HOST
             value: {{ .Values.timescaledb.serviceName }}
+          - name: GF_SECURITY_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.grafana.secretName }}
+                key: password
       volumes:
       - name: {{ .Values.grafana.configMapName }}-datasources
         configMap:
