@@ -20,7 +20,7 @@ timescale_port = os.getenv('TS_PORT', 5432)
 if timescale_host is None or timescale_user is None or timescale_password is None:
     sys.exit("Environment variables are required to connect to TimescaleDB: TS_HOST, TS_USER, TS_PASSWORD")
 
-CONFIG_FILE = "/etc/telemetry-models/model_configuration.yaml"
+CONFIG_FILE = os.getenv('TM_CONFIG_FILE', "/etc/telemetry-models/model_configuration.yaml")
 
 # establish connection
 conn = psycopg2.connect(host=timescale_host, user=timescale_user, password=timescale_password, port=timescale_port)
@@ -62,6 +62,12 @@ def replace_model_predictions(model, model_config, dimension):
                         "{} varchar".format(model_config['dimension']))
             )
     )
+    # Convert table to Hypertable if it does not exist
+    cur.execute(
+        sql.SQL("SELECT create_hypertable('{}', 'time_bucket', if_not_exists => TRUE, migrate_data => TRUE)")
+            .format(sql.Identifier(model_config['model_name']))
+    )
+
     # Create index
     cur.execute(
         sql.SQL("create unique index if not exists {} on {} using btree (\"time_bucket\", {})")
@@ -72,19 +78,16 @@ def replace_model_predictions(model, model_config, dimension):
             )
     )
 
-    # Delete stored model values
-    cur.execute(
-        sql.SQL("delete from {} where {} = %s").format(
-            sql.Identifier(model_config['model_name']),
-            sql.Identifier(model_config['dimension'])
-        ), [dimension]
-    )
-
-    # Insert new model values
-    insert_str = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
+    # Upsert new model values
+    insert_str = sql.SQL(
+        '''INSERT INTO {} ({}) VALUES ({})
+        ON CONFLICT (\"time_bucket\", {}) DO UPDATE
+        SET lower_bounds = EXCLUDED.lower_bounds, upper_bounds = EXCLUDED.upper_bounds'''
+    ).format(
         sql.Identifier(model_config['model_name']),
         sql.SQL(",").join(map(sql.Identifier, df_columns)),
-        sql.SQL(",").join(map(sql.Placeholder, df_columns))
+        sql.SQL(",").join(map(sql.Placeholder, df_columns)),
+        sql.Identifier(model_config['dimension'])
     )
     psycopg2.extras.execute_batch(cur, insert_str, model.to_dict('records'))
     conn.commit()
