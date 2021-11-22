@@ -34,6 +34,7 @@ promscale:
 # Telemetry-Model default values
 telemetryModel:
   cronJobName: telemetry-model-builder
+  imageName: gdieckmann/telemetry-models:1.0.1
   configMapName: telemetry-model-builder-conf
   secretName: telemetry-model-db
 

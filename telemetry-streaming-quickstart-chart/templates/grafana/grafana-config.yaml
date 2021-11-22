@@ -28,14 +28,14 @@ data:
     apiVersion: 1
 
     providers:
-      - name: 'GJD: Provided dashboard'
+      - name: 'Provided dashboard'
         type: file
         disableDeletion: true
         allowUiUpdates: false
         options:
           path: /var/lib/grafana/dashboards
           foldersFromFilesStructure: true
-  basicDashboard.json: |-
+  systemDashboard.json: |-
     {
       "annotations": {
         "list": [
@@ -60,10 +60,25 @@ data:
       "fiscalYearStartMonth": 0,
       "gnetId": null,
       "graphTooltip": 0,
-      "id": 2,
+      "id": 5,
+      "iteration": 1637361826878,
       "links": [],
       "liveNow": false,
       "panels": [
+        {
+          "collapsed": false,
+          "datasource": null,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "panels": [],
+          "title": "CPU",
+          "type": "row"
+        },
         {
           "datasource": "TimescaleDB",
           "fieldConfig": {
@@ -114,15 +129,231 @@ data:
                 ]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "predicted: upper_bounds"
+                },
+                "properties": [
+                  {
+                    "id": "custom.fillBelowTo",
+                    "value": "predicted: lower_bounds"
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
-            "h": 9,
+            "h": 8,
             "w": 12,
             "x": 0,
-            "y": 0
+            "y": 1
           },
-          "id": 2,
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "format": "time_series",
+              "group": [
+                {
+                  "params": [
+                    "$__interval",
+                    "none"
+                  ],
+                  "type": "time"
+                }
+              ],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  $__timeGroupAlias(\"time\",$__interval),\n  avg(value) AS \"system_cpu\"\nFROM system_cpu\nWHERE\n  $__timeFilter(\"time\") AND\n  jsonb(labels) ->> 'hostname' = '$Hostname'\nGROUP BY 1\nORDER BY 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "avg"
+                    ],
+                    "type": "aggregate"
+                  },
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "alias"
+                  }
+                ]
+              ],
+              "table": "system_cpu",
+              "timeColumn": "\"time\"",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "name": "",
+                  "params": [
+                    "json",
+                    "=",
+                    "value"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            },
+            {
+              "format": "time_series",
+              "group": [],
+              "hide": false,
+              "metricColumn": "none",
+              "rawQuery": false,
+              "rawSql": "SELECT\n  time_bucket AS \"time\",\n  lower_bounds AS \"predicted: lower_bounds\",\n  upper_bounds AS \"predicted: upper_bounds\"\nFROM predictions_system_cpu\nWHERE\n  $__timeFilter(time_bucket) AND\n  hostname = '$Hostname'\nORDER BY 1",
+              "refId": "B",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "lower_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: lower_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ],
+                [
+                  {
+                    "params": [
+                      "upper_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: upper_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ]
+              ],
+              "table": "predictions_system_cpu",
+              "timeColumn": "time_bucket",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "datatype": "varchar",
+                  "name": "",
+                  "params": [
+                    "hostname",
+                    "=",
+                    "'$Hostname'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "title": "System CPU by Hostname",
+          "type": "timeseries"
+        },
+        {
+          "datasource": "TimescaleDB",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "predicted: upper_bounds"
+                },
+                "properties": [
+                  {
+                    "id": "custom.fillBelowTo",
+                    "value": "predicted: lower_bounds"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 1
+          },
+          "id": 8,
           "options": {
             "legend": {
               "calcs": [],
@@ -138,8 +369,8 @@ data:
               "format": "time_series",
               "group": [],
               "metricColumn": "none",
-              "rawQuery": false,
-              "rawSql": "SELECT\n  \"time\" AS \"time\",\n  value\nFROM system_cpu\nWHERE\n  $__timeFilter(\"time\")\nORDER BY 1",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  $__timeGroupAlias(\"time\",$__interval),\n  avg(value) AS \"system_tmmCpu\"\nFROM \"system_tmmCpu\"\nWHERE\n  $__timeFilter(\"time\") AND\n  jsonb(labels) ->> 'hostname' = '$Hostname'\nGROUP BY 1\nORDER BY 1",
               "refId": "A",
               "select": [
                 [
@@ -151,9 +382,9 @@ data:
                   }
                 ]
               ],
-              "table": "system_cpu",
+              "table": "\"httpProfiles_v10Reqs\"",
               "timeColumn": "\"time\"",
-              "timeColumnType": "timestamptz",
+              "timeColumnType": "timestamp",
               "where": [
                 {
                   "name": "$__timeFilter",
@@ -161,9 +392,428 @@ data:
                   "type": "macro"
                 }
               ]
+            },
+            {
+              "format": "time_series",
+              "group": [],
+              "hide": false,
+              "metricColumn": "hostname",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  time_bucket AS \"time\",\n  lower_bounds AS \"predicted: lower_bounds\",\n  upper_bounds AS \"predicted: upper_bounds\"\nFROM \"predictions_system_tmmCpu\"\nWHERE\n  $__timeFilter(time_bucket) AND\n  hostname = '$Hostname'\nORDER BY 1,2",
+              "refId": "B",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "lower_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: lower_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ],
+                [
+                  {
+                    "params": [
+                      "upper_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: upper_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ]
+              ],
+              "table": "\"predictions_system_tmmCpu\"",
+              "timeColumn": "time_bucket",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "datatype": "varchar",
+                  "name": "",
+                  "params": [
+                    "hostname",
+                    "=",
+                    "'$Hostname'"
+                  ],
+                  "type": "expression"
+                }
+              ]
             }
           ],
-          "title": "Panel Title",
+          "title": "TMM CPU by Hostname",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 9
+          },
+          "id": 2,
+          "title": "Memory",
+          "type": "row"
+        },
+        {
+          "datasource": "TimescaleDB",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "predicted: upper_bounds"
+                },
+                "properties": [
+                  {
+                    "id": "custom.fillBelowTo",
+                    "value": "predicted: lower_bounds"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 10
+          },
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  $__timeGroupAlias(\"time\",$__interval),\n  avg(value) AS \"system_memory\"\nFROM system_memory\nWHERE\n  $__timeFilter(\"time\") AND\n  jsonb(labels) ->> 'hostname' = '$Hostname'\nGROUP BY 1\nORDER BY 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "\"httpProfiles_v10Reqs\"",
+              "timeColumn": "\"time\"",
+              "timeColumnType": "timestamp",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            },
+            {
+              "format": "time_series",
+              "group": [],
+              "hide": false,
+              "metricColumn": "none",
+              "rawQuery": false,
+              "rawSql": "SELECT\n  time_bucket AS \"time\",\n  lower_bounds AS \"predicted: lower_bounds\",\n  upper_bounds AS \"predicted: upper_bounds\"\nFROM predictions_system_memory\nWHERE\n  $__timeFilter(time_bucket) AND\n  hostname = '$Hostname'\nORDER BY 1",
+              "refId": "B",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "lower_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: lower_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ],
+                [
+                  {
+                    "params": [
+                      "upper_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: upper_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ]
+              ],
+              "table": "predictions_system_memory",
+              "timeColumn": "time_bucket",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "datatype": "varchar",
+                  "name": "",
+                  "params": [
+                    "hostname",
+                    "=",
+                    "'$Hostname'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "title": "System Memory by Hostname",
+          "type": "timeseries"
+        },
+        {
+          "datasource": "TimescaleDB",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "predicted: upper_bounds"
+                },
+                "properties": [
+                  {
+                    "id": "custom.fillBelowTo",
+                    "value": "predicted: lower_bounds"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 10
+          },
+          "id": 12,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  $__timeGroupAlias(\"time\",$__interval),\n  avg(value) AS \"system_tmmMemory\"\nFROM \"system_tmmMemory\"\nWHERE\n  $__timeFilter(\"time\") AND\n  jsonb(labels) ->> 'hostname' = '$Hostname'\nGROUP BY 1\nORDER BY 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "\"httpProfiles_v10Reqs\"",
+              "timeColumn": "\"time\"",
+              "timeColumnType": "timestamp",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            },
+            {
+              "format": "time_series",
+              "group": [],
+              "hide": false,
+              "metricColumn": "none",
+              "rawQuery": false,
+              "rawSql": "SELECT\n  time_bucket AS \"time\",\n  lower_bounds AS \"predicted: lower_bounds\",\n  upper_bounds AS \"predicted: upper_bounds\"\nFROM \"predictions_system_tmmMemory\"\nWHERE\n  $__timeFilter(time_bucket) AND\n  hostname = '$Hostname'\nORDER BY 1",
+              "refId": "B",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "lower_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: lower_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ],
+                [
+                  {
+                    "params": [
+                      "upper_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: upper_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ]
+              ],
+              "table": "\"predictions_system_tmmMemory\"",
+              "timeColumn": "time_bucket",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "datatype": "varchar",
+                  "name": "",
+                  "params": [
+                    "hostname",
+                    "=",
+                    "'$Hostname'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "title": "TMM Memory by Hostname",
           "type": "timeseries"
         }
       ],
@@ -171,15 +821,470 @@ data:
       "style": "dark",
       "tags": [],
       "templating": {
-        "list": []
+        "list": [
+          {
+            "allValue": null,
+            "current": {
+              "selected": false
+            },
+            "datasource": "TimescaleDB",
+            "definition": "select distinct hostname from predictions_system_cpu",
+            "description": null,
+            "error": null,
+            "hide": 0,
+            "includeAll": false,
+            "label": "Hostname",
+            "multi": false,
+            "name": "Hostname",
+            "options": [],
+            "query": "select distinct hostname from predictions_system_cpu",
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          }
+        ]
       },
       "time": {
-        "from": "now-6h",
+        "from": "now-30m",
         "to": "now"
       },
       "timepicker": {},
       "timezone": "",
-      "title": "Basic",
-      "uid": "g9Xufec7k",
-      "version": 1
+      "title": "System",
+      "uid": "vXnUX6cnk",
+      "version": 2
+    }
+  virtualsDashboard.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": 3,
+      "iteration": 1637361458626,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "datasource": null,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 2,
+          "panels": [],
+          "title": "Bits In/Out",
+          "type": "row"
+        },
+        {
+          "datasource": "TimescaleDB",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "predicted: upper_bounds"
+                },
+                "properties": [
+                  {
+                    "id": "custom.fillBelowTo",
+                    "value": "predicted: lower_bounds"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "id": 5,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  $__timeGroupAlias(\"time\",$__interval),\n  avg(value) AS \"virtualServers_clientside_bitsIn\"\nFROM \"virtualServers_clientside_bitsIn\"\nWHERE\n  $__timeFilter(\"time\") AND\n  jsonb(labels) ->> 'name' = '$Name'\nGROUP BY 1\nORDER BY 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "\"httpProfiles_v10Reqs\"",
+              "timeColumn": "\"time\"",
+              "timeColumnType": "timestamp",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            },
+            {
+              "format": "time_series",
+              "group": [],
+              "hide": false,
+              "metricColumn": "none",
+              "rawQuery": false,
+              "rawSql": "SELECT\n  time_bucket AS \"time\",\n  lower_bounds AS \"predicted: lower_bounds\",\n  upper_bounds AS \"predicted: upper_bounds\"\nFROM \"predictions_virtualServers_clientside_bitsIn\"\nWHERE\n  $__timeFilter(time_bucket) AND\n  name = '$Name'\nORDER BY 1",
+              "refId": "B",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "lower_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: lower_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ],
+                [
+                  {
+                    "params": [
+                      "upper_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: upper_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ]
+              ],
+              "table": "\"predictions_virtualServers_clientside_bitsIn\"",
+              "timeColumn": "time_bucket",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "datatype": "varchar",
+                  "name": "",
+                  "params": [
+                    "name",
+                    "=",
+                    "'$Name'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "title": "Bits In by Virtual Server Name",
+          "type": "timeseries"
+        },
+        {
+          "datasource": "TimescaleDB",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "predicted: upper_bounds"
+                },
+                "properties": [
+                  {
+                    "id": "custom.fillBelowTo",
+                    "value": "predicted: lower_bounds"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 1
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  $__timeGroupAlias(\"time\",$__interval),\n  avg(value) AS \"virtualServers_clientside_bitsOut\"\nFROM \"virtualServers_clientside_bitsOut\"\nWHERE\n  $__timeFilter(\"time\") AND\n  jsonb(labels) ->> 'name' = '$Name'\nGROUP BY 1\nORDER BY 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "table": "\"httpProfiles_v10Reqs\"",
+              "timeColumn": "\"time\"",
+              "timeColumnType": "timestamp",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            },
+            {
+              "format": "time_series",
+              "group": [],
+              "hide": false,
+              "metricColumn": "none",
+              "rawQuery": false,
+              "rawSql": "SELECT\n  time_bucket AS \"time\",\n  lower_bounds AS \"predicted: lower_bounds\",\n  upper_bounds AS \"predicted: upper_bounds\"\nFROM \"predictions_virtualServers_clientside_bitsOut\"\nWHERE\n  $__timeFilter(time_bucket) AND\n  name = '$Name'\nORDER BY 1",
+              "refId": "B",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "lower_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: lower_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ],
+                [
+                  {
+                    "params": [
+                      "upper_bounds"
+                    ],
+                    "type": "column"
+                  },
+                  {
+                    "params": [
+                      "predicted: upper_bounds"
+                    ],
+                    "type": "alias"
+                  }
+                ]
+              ],
+              "table": "\"predictions_virtualServers_clientside_bitsOut\"",
+              "timeColumn": "time_bucket",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                },
+                {
+                  "datatype": "varchar",
+                  "name": "",
+                  "params": [
+                    "name",
+                    "=",
+                    "'$Name'"
+                  ],
+                  "type": "expression"
+                }
+              ]
+            }
+          ],
+          "title": "Bits Out by Virtual Server Name",
+          "type": "timeseries"
+        }
+      ],
+      "schemaVersion": 32,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "allValue": null,
+            "current": {
+              "selected": false
+            },
+            "datasource": "TimescaleDB",
+            "definition": "select distinct name from \"predictions_virtualServers_clientside_bitsIn\"",
+            "description": null,
+            "error": null,
+            "hide": 0,
+            "includeAll": false,
+            "label": "Virtual Server Name",
+            "multi": false,
+            "name": "Name",
+            "options": [],
+            "query": "select distinct name from \"predictions_virtualServers_clientside_bitsIn\"",
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-30m",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "VirtualServers",
+      "uid": "6ZRbj6cnz",
+      "version": 6
     }

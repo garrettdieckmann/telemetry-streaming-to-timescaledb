@@ -12,7 +12,7 @@ spec:
         metadata:
         spec:
           containers:
-          - image: gdieckmann/telemetry-models:1.0.1
+          - image: {{ .Values.telemetryModel.imageName }}
             name: {{ .Values.telemetryModel.cronJobName }}
             env:
             - name: TS_HOST

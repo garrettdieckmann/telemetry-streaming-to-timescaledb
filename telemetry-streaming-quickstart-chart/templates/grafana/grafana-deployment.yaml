@@ -52,5 +52,7 @@ spec:
         configMap:
           name: {{ .Values.grafana.configMapName }}
           items:
-          - key: basicDashboard.json
-            path: basicDashboard.json
+          - key: systemDashboard.json
+            path: systemDashboard.json
+          - key: virtualsDashboard.json
+            path: virtualsDashboard.json

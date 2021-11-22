@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: timescaledb
+  name: timescaledb-svc-external
+  namespace: ts
+spec:
+  ports:
+  - port: 5432
+    protocol: TCP
+    nodePort: 30040
+  selector:
+    app: timescaledb
+  type: NodePort
