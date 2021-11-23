@@ -10,7 +10,7 @@ entries:
     name: telemetry-streaming-quickstart-chart
     type: application
     urls:
-    - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/docs/telemetry-streaming-quickstart-chart-1.0.0.tgz
+    - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/telemetry-streaming-quickstart-chart-1.0.0.tgz
     version: 1.0.0
   - apiVersion: v2
     appVersion: 1.0.2
@@ -21,7 +21,7 @@ entries:
     name: telemetry-streaming-quickstart-chart
     type: application
     urls:
-    - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/docs/telemetry-streaming-quickstart-chart-0.2.0.tgz
+    - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/telemetry-streaming-quickstart-chart-0.2.0.tgz
     version: 0.2.0
   - apiVersion: v2
     appVersion: 1.0.1
@@ -32,6 +32,6 @@ entries:
     name: telemetry-streaming-quickstart-chart
     type: application
     urls:
-    - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/docs/telemetry-streaming-quickstart-chart-0.1.0.tgz
+    - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/telemetry-streaming-quickstart-chart-0.1.0.tgz
     version: 0.1.0
 generated: "2021-11-22T15:57:56.949844-08:00"
