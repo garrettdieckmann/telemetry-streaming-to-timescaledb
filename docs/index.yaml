@@ -3,7 +3,18 @@ entries:
   telemetry-streaming-quickstart:
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2021-11-22T16:11:41.537476-08:00"
+    created: "2021-12-10T14:16:06.275958-08:00"
+    description: A Helm chart to get started with a full Telemetry Streaming quickstart
+      environment
+    digest: 1f79dc8182618f8ccd450856d17ddf8ae525ee788f7883f83f2ea7cc524c7892
+    name: telemetry-streaming-quickstart
+    type: application
+    urls:
+    - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/telemetry-streaming-quickstart-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: 1.0.2
+    created: "2021-12-10T14:16:06.274883-08:00"
     description: A Helm chart to get started with a full Telemetry Streaming quickstart
       environment
     digest: 11d79aa0518be7ea7c776e9487e16b38a7e72b2f503b29c7b7f711cd4a390eb7
@@ -15,7 +26,7 @@ entries:
   telemetry-streaming-quickstart-chart:
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2021-11-22T16:11:41.54135-08:00"
+    created: "2021-12-10T14:16:06.278499-08:00"
     description: A Helm chart to get started with a full Telemetry Streaming quickstart
       environment
     digest: 5acbe4ea4d4cf7da1906c0424cdcc11dcdb826da143952a0c813a22901e7f9df
@@ -26,7 +37,7 @@ entries:
     version: 1.0.0
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2021-11-22T16:11:41.539036-08:00"
+    created: "2021-12-10T14:16:06.277539-08:00"
     description: A Helm chart to get started with a full Telemetry Streaming quickstart
       environment
     digest: 347c09153cb067e5a4ca674f0820bd6779d1ea8a0dfee4b58b9e56d7a01a3a91
@@ -37,7 +48,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: 1.0.1
-    created: "2021-11-22T16:11:41.538139-08:00"
+    created: "2021-12-10T14:16:06.276661-08:00"
     description: A Helm chart to get started with a full Telemetry Streaming quickstart
       environment
     digest: 4f880494cb8629565f87e50ec8e9a4b8d0d8d79ff439c8d85f1e4f0abcaca6b7
@@ -46,4 +57,4 @@ entries:
     urls:
     - https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb/telemetry-streaming-quickstart-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2021-11-22T16:11:41.536483-08:00"
+generated: "2021-12-10T14:16:06.273152-08:00"

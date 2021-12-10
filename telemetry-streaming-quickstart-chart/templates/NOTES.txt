@@ -1,14 +1,14 @@
 OpenTelemetry Metrics can now be sent to:
 {{- if .Values.openTelemetry.useLoadBalancer }}
-export OTEL_IP=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.status.loadBalancer.ingress[0].ip} services {{ .Values.grafana.externalServiceName }})
-export OTEL_COLLECTOR_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].port}" services {{ .Values.grafana.externalServiceName }})
+export OTEL_COLLECTOR_IP=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.status.loadBalancer.ingress[0].ip} services {{ .Values.openTelemetry.externalServiceName }})
+export OTEL_COLLECTOR_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].port}" services {{ .Values.openTelemetry.externalServiceName }})
 {{- else }}
-export OTEL_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-export OTEL_COLLECTOR_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Values.grafana.externalServiceName }})
+export OTEL_COLLECTOR_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+export OTEL_COLLECTOR_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Values.openTelemetry.externalServiceName }})
 {{- end }}
 
 
-echo http://$Values:$OTEL_COLLECTOR_PORT
+echo http://$OTEL_COLLECTOR_IP:$OTEL_COLLECTOR_PORT
 
 A fully configured Grafana dashboard should now be accessible at:
 {{- if .Values.openTelemetry.useLoadBalancer }}
