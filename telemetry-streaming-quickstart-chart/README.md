@@ -36,14 +36,14 @@ Helm chart for the "Telemetry Streaming Quickstart" environment.
 | `openTelemetry.serviceName` | Name of the OpenTelemetry Service (scraped by Prometheus) | `otel-collector-prom-svc` |
 | `openTelemetry.externalServiceName` | Name of the OpenTelemetry external Service (receiver endpoint)  | `otel-collector-ingest-svc` |
 | `openTelemetry.nodePort` | Default NodePort port  | `30681` |
-| `openTelemetry.` | Whether or not to use a Kubernetes LoadBalancer (uses NodePort by default) | `false` |
+| `openTelemetry.useLoadBalancer` | Whether or not to use a Kubernetes LoadBalancer (uses NodePort by default) | `false` |
 
 ### Prometheus parameters
 | Name | Description | Default Value |
 | ---- | ----------- | ------------- |
 | `prometheus.deploymentName` | Name of the Prometheus Deployment  | `prometheus` |
 | `prometheus.configMapName` | Name of the Prometheus ConfigMap  | `prometheus-conf` |
-| `prometheus.` | Name of the Prometheus Service  | `prometheus-svc` |
+| `prometheus.serviceName` | Name of the Prometheus Service  | `prometheus-svc` |
 
 ### Promscale parameters
 | Name | Description | Default Value |
