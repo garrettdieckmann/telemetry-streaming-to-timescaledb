@@ -55,6 +55,19 @@ As noted in the Helm install output, two Kubernetes services will be exposed as 
 1) one for the OpenTelemetry Collector @ `http://$OTEL_COLLECTOR_IP:$OTEL_COLLECTOR_PORT`
 2) one for Grafana @ `http://$GRAFANA_IP:$GRAFANA_PORT`
 
+### Deploying in a Cloud Provider
+The Telemetry Streaming Quick Start Helm chart can also be deployed into a cloud provider's managed Kubernetes service. The example below shows how the quick start can be deployed into [DigitalOcean's Managed Kubernetes Service](https://www.digitalocean.com/products/kubernetes/). Using a cloud provider also allows for the quick start to use a Cloud LoadBalancer as the Kubernetes Service type.
+1. Create (if one hasn't already been created) a managed Kubernetes cluster in DigitalOcean. This will provision a small cluster (1 node, with 2 vCPUs and 2GB of RAM) that will be sufficient for this quickstart.
+```
+> doctl kubernetes cluster create telemetry-streaming-quickstart --count 1 --size s-2vcpu-2gb
+Notice: Cluster is provisioning, waiting for cluster to be running
+....
+```
+2. Deploy the Helm chart into the DigitalOcean cluster, and requesting 2 Load Balancers to be provisioned (1 for the Grafana dashboard, and 1 for the OpenTelemetry Collector's receiver)
+```
+TODO
+```
+
 ### Sending Telemetry to the Quick Start environment
 Any this point, any OpenTelemetry metrics can be sent to the OpenTelemetry Collector. To configure F5 Telemetry Streaming to send telemetry data, via the OpenTelemetry Line Protocol, to the OpenTelemetry Collector, submit the following declaration to F5 Telemetry Streaming:
 ```
