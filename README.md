@@ -58,15 +58,48 @@ As noted in the Helm install output, two Kubernetes services will be exposed as 
 ### Deploying in a Cloud Provider
 The Telemetry Streaming Quick Start Helm chart can also be deployed into a cloud provider's managed Kubernetes service. The example below shows how the quick start can be deployed into [DigitalOcean's Managed Kubernetes Service](https://www.digitalocean.com/products/kubernetes/). Using a cloud provider also allows for the quick start to use a Cloud LoadBalancer as the Kubernetes Service type.
 1. Create (if one hasn't already been created) a managed Kubernetes cluster in DigitalOcean. This will provision a small cluster (1 node, with 2 vCPUs and 2GB of RAM) that will be sufficient for this quickstart.
+
+**Pricing Note:** As of this writing, the monthly cost of this quickstart is $35/month: ($15/month for the 2vCPU and 2GB of memory Kubernetes cluster, and $10/month for each Load Balancer)
 ```
 > doctl kubernetes cluster create telemetry-streaming-quickstart --count 1 --size s-2vcpu-2gb
 Notice: Cluster is provisioning, waiting for cluster to be running
 ....
 ```
-2. Deploy the Helm chart into the DigitalOcean cluster, and requesting 2 Load Balancers to be provisioned (1 for the Grafana dashboard, and 1 for the OpenTelemetry Collector's receiver)
+2. Deploy the Helm chart into the DigitalOcean cluster, and requesting 2 Load Balancers to be provisioned (1 for the Grafana dashboard (`grafana.useLoadBalancer=true`), and 1 for the OpenTelemetry Collector's receiver (`openTelemetry.useLoadBalancer=true`))
 ```
-TODO
+> helm repo add ts https://garrettdieckmann.github.io/telemetry-streaming-to-timescaledb
+> export TIMESCALE_PASSWORD=...
+> export GRAFANA_PASSWORD=...
+> helm install ts/telemetry-streaming-quickstart \
+    --generate-name \
+    --set timescaledb.password=$TIMESCALE_PASSWORD \
+    --set grafana.adminPassword=$GRAFANA_PASSWORD \
+    --set grafana.useLoadBalancer=true \
+    --set openTelemetry.useLoadBalancer=true
+NAME: telemetry-streaming-quickstart-1639421620
+LAST DEPLOYED: Mon Dec 13 10:53:42 2021
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+OpenTelemetry Metrics can now be sent to:
+export OTEL_COLLECTOR_IP=$(kubectl get --namespace telemetry-streaming-quickstart -o jsonpath="{.status.loadBalancer.ingress[0].ip}" services otel-collector-ingest-svc)
+export OTEL_COLLECTOR_PORT=$(kubectl get --namespace telemetry-streaming-quickstart -o jsonpath="{.spec.ports[0].port}" services otel-collector-ingest-svc)
+
+
+echo http://$OTEL_COLLECTOR_IP:$OTEL_COLLECTOR_PORT
+
+A fully configured Grafana dashboard should now be accessible at:
+export GRAFANA_IP=$(kubectl get --namespace telemetry-streaming-quickstart -o jsonpath="{.status.loadBalancer.ingress[0].ip}" services grafana-external-svc)
+export GRAFANA_PORT=$(kubectl get --namespace telemetry-streaming-quickstart -o jsonpath="{.spec.ports[0].port}" services grafana-external-svc)
+
+echo http://$GRAFANA_IP:$GRAFANA_PORT
 ```
+
+The Helm chart will install the QuickStart environment, but request the creation of the 2 Load Balancers. The OpenTelemetry and Grafana services can now be accessed, on the public internet, via the provisioned Load Balancers:
+1) one for the OpenTelemetry Collector @ `http://$OTEL_COLLECTOR_IP:$OTEL_COLLECTOR_PORT`
+2) one for Grafana @ `http://$GRAFANA_IP:$GRAFANA_PORT`
 
 ### Sending Telemetry to the Quick Start environment
 Any this point, any OpenTelemetry metrics can be sent to the OpenTelemetry Collector. To configure F5 Telemetry Streaming to send telemetry data, via the OpenTelemetry Line Protocol, to the OpenTelemetry Collector, submit the following declaration to F5 Telemetry Streaming:

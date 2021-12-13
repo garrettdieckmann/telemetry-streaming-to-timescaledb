@@ -17,3 +17,6 @@ docker run -it -e TS_HOST=$TS_HOST \
     -v $(pwd)/examples/model_configuration.yaml:/etc/telemetry-models/model_configuration.yaml \
     gdieckmann/telemetry-models:1.0.2
 ```
+
+# Disclaimer
+This project is intended for demonstration purposes only (demonstrating how future time series points can be predicted from historical time series data). No claims of model validity, accuracy or appropriateness are intended.
