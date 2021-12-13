@@ -97,7 +97,7 @@ export GRAFANA_PORT=$(kubectl get --namespace telemetry-streaming-quickstart -o 
 echo http://$GRAFANA_IP:$GRAFANA_PORT
 ```
 
-The Helm chart will install the QuickStart environment, but request the creation of the 2 Load Balancers. The OpenTelemetry and Grafana services can now be accessed, on the public internet, via the provisioned Load Balancers:
+The Helm chart will install the QuickStart environment, and request the creation of the 2 Load Balancers. The OpenTelemetry and Grafana services can now be accessed, on the public internet, via the provisioned Load Balancers:
 1) one for the OpenTelemetry Collector @ `http://$OTEL_COLLECTOR_IP:$OTEL_COLLECTOR_PORT`
 2) one for Grafana @ `http://$GRAFANA_IP:$GRAFANA_PORT`
 
